@@ -11,7 +11,12 @@
     "require": {},
     "autoload": {
         "psr-4": {
-            "hamm\\fuckphp\\": "src/"
+            "fuck\\": "src/Fuck"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "fuck\\": "src/Fuck"
         }
     }
 }

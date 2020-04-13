@@ -45,13 +45,6 @@ class App
                 return $this->error('Controller not found');
             }
         }
-        if (!method_exists($controller, $action)) {
-            $action = 'default';
-            if (!method_exists($controller, $action)) {
-                return $this->error('Action not found');
-            }
-        }
-
         $class = new $controller($this);
         $result = $class->$action();
         if (is_object($result)) {

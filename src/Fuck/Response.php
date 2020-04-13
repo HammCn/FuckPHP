@@ -11,13 +11,9 @@ class Response
     public function __construct()
     {
     }
-    public function setHeader()
+    public function setHeader($key, $value)
     {
-
-    }
-    public function setBody()
-    {
-
+        $this->header[$key] = $value;
     }
     public function json(array $array)
     {
@@ -25,13 +21,10 @@ class Response
         $this->body = json_encode($array);
         return $this;
     }
-    public function html()
+    public function html(string $html)
     {
-
-    }
-    public function xml()
-    {
-
+        $this->body = $html;
+        return $this;
     }
     public function redirect($url, $httpCode = 302)
     {

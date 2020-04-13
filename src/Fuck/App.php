@@ -1,33 +1,77 @@
 <?php
 namespace fuck;
-use app\admin\controller\Test;
+
 class App
 {
     const VERSION = '1.0.0';
     protected $debug = false;
-    protected $request = null;
+    protected $request;
+    protected $response;
     public function __construct()
     {
-
+        //获取request和response对象
+        $this->request = new Request();
+        $this->response = new Response();
+    }
+    public function request()
+    {
+        return $this->request;
+    }
+    public function repsonse()
+    {
+        return $this->repsonse();
     }
     public function run()
     {
-        $this->request = new Request();
         return $this->initController();
     }
+    /**
+     * 初始化控制器
+     *
+     * @return void
+     */
     private function initController()
     {
         $controller = "./app/" . $this->request->module() . "/controller/" . $this->request->controller() . ".php";
-        $action = $this->request->action();
-        if (!is_file($controller)) {
+        if (is_file($controller)) {
+            $controller = "app\\" . $this->request->module() . "\\controller\\" . $this->request->controller();
+            $action = $this->request->action();
+        } else {
             $controller = "./app/" . $this->request->module() . "/controller/Default.php";
-            $action = "index";
-            if (!is_file($controller)) {
+            if (is_file("./" . $controller . ".php")) {
+                $controller = "app\\" . $this->request->module() . "\\controller\\Default";
+                $action = "index";
+            } else {
                 $controller = new Controller();
-                return $controller->error('Controller not found!');
+                return $this->error('Controller not found');
             }
         }
-        $controller = "app\admin\controller\Test";
-        print_r(new $controller());
+        if (!method_exists($controller, $action)) {
+            $action = 'default';
+            if (!method_exists($controller, $action)) {
+                return $this->error('Action not found');
+            }
+        }
+
+        $class = new $controller($this);
+        $result = $class->$action();
+        if (is_object($result)) {
+            $result_class = get_class($result);
+            if ($result_class == "fuck\Response") {
+                return $result;
+            } else {
+                return $this->error($result_class . ' not surpport');
+            }
+        } else if (is_array($result)) {
+            $result = implode(",", $result);
+        } else {
+            //简单数字
+            $result = (string) $result;
+        }
+        return $response->html($result);
+    }
+    private function error($message, $title = 'FuckPHP')
+    {
+        return $this->response->html('<html><head><title>' . $title . '</title></head><body><center><h1>' . $message . '</h1><hr>Powered by FuckPHP</center></body></html>');
     }
 }

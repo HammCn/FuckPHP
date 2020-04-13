@@ -42,7 +42,6 @@ class App
                 $controller = "app\\" . $this->request->module() . "\\controller\\Default";
                 $action = "index";
             } else {
-                $controller = new Controller();
                 return $this->error('Controller not found');
             }
         }

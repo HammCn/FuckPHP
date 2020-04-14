@@ -7,19 +7,24 @@ class App
     protected $debug = false;
     protected $request;
     protected $response;
+    protected $beforeArg;
     public function __construct()
     {
         //获取request和response对象
         $this->request = new Request();
         $this->response = new Response();
     }
+    public function test()
+    {
+        echo 123;die;
+    }
     public function request()
     {
         return $this->request;
     }
-    public function repsonse()
+    public function response()
     {
-        return $this->repsonse();
+        return $this->response;
     }
     public function run()
     {
@@ -46,7 +51,18 @@ class App
             }
         }
         $class = new $controller($this);
-        $result = $class->$action();
+        if (method_exists($class, "__init")) {
+            $this->beforeArg = $class->__init();
+        } else {
+            $this->beforeArg = null;
+        }
+        if (!method_exists($class, $action)) {
+            $action = '__default';
+            if (!method_exists($class, $action)) {
+                return $this->error('Action not found');
+            }
+        }
+        $result = $class->$action($beforeArg);
         if (is_object($result)) {
             $result_class = get_class($result);
             if ($result_class == "fuck\Response") {
@@ -60,7 +76,7 @@ class App
             //简单数字
             $result = (string) $result;
         }
-        return $response->html($result);
+        return $this->response->html($result);
     }
     private function error($message, $title = 'FuckPHP')
     {
